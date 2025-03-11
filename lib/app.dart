@@ -22,6 +22,8 @@ class TaskManagerApp extends StatelessWidget {
             fixedSize: Size.fromWidth(double.maxFinite),
             backgroundColor: Colors.green,
             foregroundColor: Colors.white,
+            iconColor: Colors.white,
+            iconSize: 30,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -29,6 +31,7 @@ class TaskManagerApp extends StatelessWidget {
         ),
         textTheme: TextTheme(
           titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+          bodyLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
       home: SplashScreen(),
