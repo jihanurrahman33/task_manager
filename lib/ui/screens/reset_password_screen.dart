@@ -16,6 +16,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final TextEditingController _confirmNewPasswordTEController =
       TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isObsecure1 = true;
+  bool _isObsecure2 = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,12 +44,40 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
+                  obscureText: _isObsecure1,
                   textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(hintText: 'New Password'),
+                  decoration: InputDecoration(
+                    hintText: 'New Password',
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _isObsecure1 = !_isObsecure1;
+                        });
+                      },
+                      icon:
+                          _isObsecure1
+                              ? Icon(Icons.remove_red_eye)
+                              : Icon(Icons.remove_red_eye_outlined),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
-                  decoration: InputDecoration(hintText: 'Confidm New Password'),
+                  obscureText: _isObsecure2,
+                  decoration: InputDecoration(
+                    hintText: 'Confidm New Password',
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _isObsecure2 = !_isObsecure2;
+                        });
+                      },
+                      icon:
+                          _isObsecure2
+                              ? Icon(Icons.remove_red_eye)
+                              : Icon(Icons.remove_red_eye_outlined),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 8),
 

@@ -16,6 +16,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _mobileTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isObsecure = true;
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +66,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
+                    obscureText: _isObsecure,
                     controller: _passwordTEController,
-                    decoration: InputDecoration(hintText: 'Password'),
+                    decoration: InputDecoration(
+                      hintText: 'Password',
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isObsecure = !_isObsecure;
+                          });
+                        },
+                        icon:
+                            _isObsecure
+                                ? Icon(Icons.remove_red_eye)
+                                : Icon(Icons.remove_red_eye_outlined),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
