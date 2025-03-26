@@ -1,9 +1,14 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/service/network_client.dart';
+import 'package:task_manager/data/utils/urls.dart';
 import 'package:task_manager/ui/screens/forgot_password_verify_email.dart';
 import 'package:task_manager/ui/screens/main_bottom_nav_screen.dart';
 import 'package:task_manager/ui/screens/register_screen.dart';
+import 'package:task_manager/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isObsecure = true;
+  bool _loginUserInProgress = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Form(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,6 +43,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
+                  validator: (value) {
+                    String email = value?.trim() ?? '';
+                    if (EmailValidator.validate(email) == false) {
+                      return 'Enter a valid email';
+                    }
+                    return null;
+                  },
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.emailAddress,
                   controller: _emailTEController,
@@ -61,9 +75,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _onTapSignInButton,
-                  child: Icon(Icons.arrow_circle_right_outlined),
+                Visibility(
+                  visible: _loginUserInProgress == false,
+                  replacement: CenteredCircularProgressIndicator(),
+                  child: ElevatedButton(
+                    onPressed: _onTapSignInButton,
+                    child: Icon(Icons.arrow_circle_right_outlined),
+                  ),
                 ),
                 const SizedBox(height: 32),
                 Center(
@@ -109,11 +127,33 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onTapSignInButton() {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => MainBottomNavScreen()),
-      (predicate) => false,
+    if (_formKey.currentState!.validate()) {
+      _loginUser();
+    }
+  }
+
+  Future<void> _loginUser() async {
+    _loginUserInProgress = true;
+    setState(() {});
+    Map<String, dynamic> requestBody = {
+      "email": _emailTEController.text.trim(),
+      "password": _passwordTEController.text,
+    };
+    NetworkResponse response = await NetworkClient.postRequest(
+      url: Urls.loginUrl,
+      body: requestBody,
     );
+    _loginUserInProgress = false;
+    setState(() {});
+    if (response.isSucess) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => MainBottomNavScreen()),
+        (predicate) => false,
+      );
+    } else {
+      showSnackBarMessage(context, response.errorMessage!);
+    }
   }
 
   void _onTapSignUpButton() {
