@@ -30,6 +30,8 @@ dependencies:
   logger: ^2.5.0
   email_validator: ^3.0.0
   bd_phone_validator:
+  shared_preferences: ^2.5.3
+  
 
 dev_dependencies:
   flutter_test:
