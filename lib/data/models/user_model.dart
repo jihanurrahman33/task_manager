@@ -25,6 +25,10 @@ class UserModel {
       'createdDate': createdDate,
     };
   }
+
+  String get fullName {
+    return '$firstName $lastName';
+  }
 }
 
 // class UserModel {
