@@ -3,9 +3,13 @@ class Urls {
 
   static const registerUrl = '$_baseUrl/Registration';
   static const loginUrl = '$_baseUrl/Login';
+  static const updateProfileUrl = '$_baseUrl/ProfileUpdate';
   static recoverVerifyEmail(String email) =>
       '$_baseUrl/RecoverVerifyEmail/$email';
   static recoverVerifyOtp(String otpCode) =>
       '$_baseUrl/RecoverVerifyOtp/$otpCode';
   static const recoverResetPassword = '$_baseUrl/RecoverResetPassword';
+
+  static const createTaskUrl = '$_baseUrl/createTask';
+  static const taskStatusCountUrl = '$_baseUrl/taskStatusCount';
 }

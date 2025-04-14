@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/service/network_client.dart';
+import 'package:task_manager/data/utils/urls.dart';
 import 'package:task_manager/ui/controllers/auth_controller.dart';
 import 'package:task_manager/ui/screens/login_screen.dart';
 import 'package:task_manager/ui/screens/main_bottom_nav_screen.dart';
 
 import 'package:task_manager/ui/widgets/screen_background.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,8 +16,10 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  Map<String, dynamic>? task;
   @override
   void initState() {
+    _taskStatusCount();
     _moveToNextScreen();
     super.initState();
   }
@@ -38,5 +43,16 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Center(child: Text('Nishak', style: TextStyle(fontSize: 30))),
       ),
     );
+  }
+
+  Future<void> _taskStatusCount() async {
+    NetworkResponse response = await NetworkClient.getRequest(
+      url: Urls.taskStatusCountUrl,
+    );
+    if (response.isSucess) {
+      task = response.data;
+    } else {
+      showSnackBarMessage(context, response.errorMessage!);
+    }
   }
 }
