@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:task_manager/data/models/task_model.dart';
 
 enum TaskStatus { sNew, progress, completed, canceled }
@@ -27,8 +28,11 @@ class TaskCard extends StatelessWidget {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             Text(taskModel.description),
-            //TODO format it using intl
-            Text('Date: ${taskModel.createdDate}'),
+
+            Text(
+              'Date: ${DateFormat('yMMMMEEEEd').format(DateTime.parse(taskModel.createdDate))}',
+            ),
+
             Row(
               children: [
                 Chip(

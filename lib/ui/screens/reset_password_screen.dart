@@ -1,10 +1,20 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/service/network_client.dart';
+import 'package:task_manager/data/utils/urls.dart';
 import 'package:task_manager/ui/screens/login_screen.dart';
+import 'package:task_manager/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+  const ResetPasswordScreen({
+    super.key,
+    required this.email,
+    required this.otp,
+  });
+  final String email;
+  final String otp;
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -15,6 +25,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       TextEditingController();
   final TextEditingController _confirmNewPasswordTEController =
       TextEditingController();
+  bool _recoverResetPasswordInProgress = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isObsecure1 = true;
   bool _isObsecure2 = true;
@@ -83,7 +94,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
                 ElevatedButton(
                   onPressed: _onTapSubmitButton,
-                  child: Text('Confirm'),
+                  child: Visibility(
+                    visible: _recoverResetPasswordInProgress == false,
+                    replacement: CenteredCircularProgressIndicator(),
+                    child: Text('Confirm'),
+                  ),
                 ),
                 const SizedBox(height: 32),
                 Center(
@@ -132,15 +147,30 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  void _onTapSubmitButton() {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-      (pre) => false,
+  void _onTapSubmitButton() async {
+    Map<String, dynamic> requestBody = {
+      "email": widget.email,
+      "OTP": widget.otp,
+      "password": _newPasswordTEController.text.trim(),
+    };
+    _recoverResetPasswordInProgress = true;
+    setState(() {});
+    NetworkResponse response = await NetworkClient.postRequest(
+      url: Urls.recoverResetPassword,
+      body: requestBody,
     );
+    _recoverResetPasswordInProgress = false;
+    setState(() {});
+    if (response.isSucess) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+        (pre) => false,
+      );
+    } else {
+      showSnackBarMessage(context, response.errorMessage!);
+    }
   }
-
-  void _onTapForgotPasswordButton() {}
 
   @override
   void dispose() {

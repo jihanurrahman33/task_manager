@@ -6,11 +6,14 @@ class Urls {
   static const updateProfileUrl = '$_baseUrl/ProfileUpdate';
   static recoverVerifyEmail(String email) =>
       '$_baseUrl/RecoverVerifyEmail/$email';
-  static recoverVerifyOtp(String otpCode) =>
-      '$_baseUrl/RecoverVerifyOtp/$otpCode';
   static const recoverResetPassword = '$_baseUrl/RecoverResetPassword';
 
   static const createTaskUrl = '$_baseUrl/createTask';
   static const taskStatusCountUrl = '$_baseUrl/taskStatusCount';
   static const newTaskListUrl = '$_baseUrl/listTaskByStatus/New';
+  static recoverVerifyEmailUrl(String email) =>
+      '$_baseUrl/RecoverVerifyEmail/$email';
+  static recoverVerifyOtpUrl(String email, String otp) =>
+      '$_baseUrl/RecoverVerifyOtp/$email/$otp';
+  static const recoverResetPasswordUrl = '$_baseUrl/RecoverResetPassword';
 }

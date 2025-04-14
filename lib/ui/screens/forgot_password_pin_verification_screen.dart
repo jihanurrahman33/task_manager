@@ -1,12 +1,17 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:task_manager/data/service/network_client.dart';
+import 'package:task_manager/data/utils/urls.dart';
 import 'package:task_manager/ui/screens/login_screen.dart';
 import 'package:task_manager/ui/screens/reset_password_screen.dart';
+import 'package:task_manager/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 class ForgotPasswordPinVerificationScreen extends StatefulWidget {
-  const ForgotPasswordPinVerificationScreen({super.key});
+  const ForgotPasswordPinVerificationScreen({super.key, required this.email});
+  final String email;
 
   @override
   State<ForgotPasswordPinVerificationScreen> createState() =>
@@ -17,6 +22,7 @@ class _ForgotPasswordPinVerificationScreenState
     extends State<ForgotPasswordPinVerificationScreen> {
   final TextEditingController _pinCodeTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _recoverVerifyOtpInProgress = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +49,8 @@ class _ForgotPasswordPinVerificationScreenState
                 ),
                 const SizedBox(height: 8),
                 PinCodeTextField(
+                  controller: _pinCodeTEController,
+
                   keyboardType: TextInputType.number,
                   length: 6,
                   obscureText: false,
@@ -61,15 +69,17 @@ class _ForgotPasswordPinVerificationScreenState
                   backgroundColor: Colors.transparent,
                   enableActiveFill: true,
 
-                  controller: _pinCodeTEController,
-
                   appContext: context,
                 ),
                 const SizedBox(height: 8),
 
                 ElevatedButton(
                   onPressed: _onTapSubmitButton,
-                  child: Text('Verify'),
+                  child: Visibility(
+                    visible: _recoverVerifyOtpInProgress == false,
+                    replacement: CenteredCircularProgressIndicator(),
+                    child: Text('Verify'),
+                  ),
                 ),
                 const SizedBox(height: 32),
                 Center(
@@ -110,11 +120,28 @@ class _ForgotPasswordPinVerificationScreenState
     );
   }
 
-  void _onTapSubmitButton() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ResetPasswordScreen()),
+  void _onTapSubmitButton() async {
+    _recoverVerifyOtpInProgress = true;
+    setState(() {});
+    NetworkResponse response = await NetworkClient.getRequest(
+      url: Urls.recoverVerifyOtpUrl(widget.email, _pinCodeTEController.text),
     );
+    _recoverVerifyOtpInProgress = false;
+    setState(() {});
+    if (response.isSucess) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => ResetPasswordScreen(
+                email: widget.email,
+                otp: _pinCodeTEController.text,
+              ),
+        ),
+      );
+    } else {
+      showSnackBarMessage(context, response.errorMessage!);
+    }
   }
 
   void _onTapSignInButton() {
@@ -124,8 +151,6 @@ class _ForgotPasswordPinVerificationScreenState
       (pre) => false,
     );
   }
-
-  void _onTapForgotPasswordButton() {}
 
   @override
   void dispose() {

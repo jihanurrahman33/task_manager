@@ -1,7 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/service/network_client.dart';
+import 'package:task_manager/data/utils/urls.dart';
 import 'package:task_manager/ui/screens/forgot_password_pin_verification_screen.dart';
+import 'package:task_manager/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 class ForgotPasswordVerifyEmailScreen extends StatefulWidget {
   const ForgotPasswordVerifyEmailScreen({super.key});
@@ -15,6 +19,7 @@ class _ForgotPasswordVerifyEmailScreenState
     extends State<ForgotPasswordVerifyEmailScreen> {
   final TextEditingController _emailTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _recoverVerifyEmailInProgress = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +54,11 @@ class _ForgotPasswordVerifyEmailScreenState
 
                 ElevatedButton(
                   onPressed: _ontapSubmitButton,
-                  child: Icon(Icons.arrow_circle_right_outlined),
+                  child: Visibility(
+                    visible: _recoverVerifyEmailInProgress == false,
+                    replacement: CenteredCircularProgressIndicator(),
+                    child: Icon(Icons.arrow_circle_right_outlined),
+                  ),
                 ),
                 const SizedBox(height: 32),
                 Center(
@@ -94,16 +103,28 @@ class _ForgotPasswordVerifyEmailScreenState
     Navigator.pop(context);
   }
 
-  void _ontapSubmitButton() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ForgotPasswordPinVerificationScreen(),
-      ),
+  void _ontapSubmitButton() async {
+    _recoverVerifyEmailInProgress = true;
+    setState(() {});
+    NetworkResponse response = await NetworkClient.getRequest(
+      url: Urls.recoverVerifyEmail(_emailTEController.text.trim()),
     );
+    _recoverVerifyEmailInProgress = false;
+    setState(() {});
+    if (response.isSucess) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => ForgotPasswordPinVerificationScreen(
+                email: _emailTEController.text.trim(),
+              ),
+        ),
+      );
+    } else {
+      showSnackBarMessage(context, response.errorMessage!);
+    }
   }
-
-  void _onTapForgotPasswordButton() {}
 
   @override
   void dispose() {
