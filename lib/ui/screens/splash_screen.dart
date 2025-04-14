@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _moveToNextScreen() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
     final bool isLoggedIn = await AuthController.checkIfUserLoggedIn();
     Navigator.pushReplacement(
       context,
@@ -40,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ScreenBackground(
-        child: Center(child: Text('Nishak', style: TextStyle(fontSize: 30))),
+        child: Center(child: Image.asset('assets/images/logo.png')),
       ),
     );
   }
