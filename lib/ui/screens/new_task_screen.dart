@@ -23,6 +23,9 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   List<TaskStatusCountModel> _taskStatusCountList = [];
   bool _getNewTasksInProgress = false;
   List<TaskModel> _newTaskList = [];
+  List<TaskModel> _completedTaskList = [];
+  List<TaskModel> _progressTaskList = [];
+  List<TaskModel> _canceledTaskList = [];
 
   @override
   void initState() {
@@ -56,6 +59,11 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                 primary: false,
                 itemBuilder: (context, index) {
                   return TaskCard(
+                    onTaskDeleted: (task) async {
+                      _newTaskList.removeWhere((t) => t.id == task.id);
+                      await _getAllTaskStatusCount();
+                      setState(() {});
+                    },
                     taskStatus: TaskStatus.sNew,
                     taskModel: _newTaskList[index],
                   );
@@ -74,11 +82,17 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     );
   }
 
-  void _onTapAddNewTask() {
-    Navigator.push(
+  void _onTapAddNewTask() async {
+    final status = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => AddNewTaskScreen()),
     );
+    if (status) {
+      _getAllTaskStatusCount();
+      _getAllNewTaskList();
+
+      setState(() {});
+    }
   }
 
   Widget _buildSummarySection() {

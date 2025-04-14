@@ -168,7 +168,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         (pre) => false,
       );
     } else {
-      showSnackBarMessage(context, response.errorMessage!);
+      showSnackBarMessage(context, response.errorMessage!, true);
     }
   }
 

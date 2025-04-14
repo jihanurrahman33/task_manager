@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/ui/widgets/task_card.dart';
 
 class CompletedTaskScreen extends StatefulWidget {
@@ -16,7 +17,10 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
         shrinkWrap: true,
         primary: false,
         itemBuilder: (context, index) {
-          // return TaskCard(taskStatus: TaskStatus.completed);
+          // return TaskCard(
+          //   taskStatus: TaskStatus.completed,
+          //   taskModel: widget.taskModel,
+          // );
         },
         separatorBuilder: (context, index) => SizedBox(height: 8),
         itemCount: 6,

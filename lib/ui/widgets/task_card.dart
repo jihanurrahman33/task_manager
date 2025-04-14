@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:task_manager/data/models/task_model.dart';
+import 'package:task_manager/data/service/network_client.dart';
+import 'package:task_manager/data/utils/urls.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 enum TaskStatus { sNew, progress, completed, canceled }
 
-class TaskCard extends StatelessWidget {
+class TaskCard extends StatefulWidget {
   const TaskCard({
     super.key,
     required this.taskStatus,
     required this.taskModel,
+    required this.onTaskDeleted,
+    this.updatedStatus,
   });
   final TaskStatus taskStatus;
   final TaskModel taskModel;
+  final Function(TaskModel) onTaskDeleted;
+  final String? updatedStatus;
+
+  @override
+  State<TaskCard> createState() => _TaskCardState();
+}
+
+class _TaskCardState extends State<TaskCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -24,13 +37,13 @@ class TaskCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              taskModel.title,
+              widget.taskModel.title,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
-            Text(taskModel.description),
+            Text(widget.taskModel.description),
 
             Text(
-              'Date: ${DateFormat('yMMMMEEEEd').format(DateTime.parse(taskModel.createdDate))}',
+              'Date: ${DateFormat('yMMMMEEEEd').format(DateTime.parse(widget.taskModel.createdDate))}',
             ),
 
             Row(
@@ -38,7 +51,7 @@ class TaskCard extends StatelessWidget {
                 Chip(
                   padding: EdgeInsets.symmetric(horizontal: 8),
                   label: Text(
-                    taskModel.status,
+                    widget.taskModel.status,
                     style: TextStyle(color: Colors.white),
                   ),
                   shape: RoundedRectangleBorder(
@@ -48,8 +61,11 @@ class TaskCard extends StatelessWidget {
                   side: BorderSide.none,
                 ),
                 const Spacer(),
-                IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
-                IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
+                IconButton(
+                  onPressed: _onTapDeleteTask,
+                  icon: Icon(Icons.delete),
+                ),
+                IconButton(onPressed: _onTapEditTask, icon: Icon(Icons.edit)),
               ],
             ),
           ],
@@ -58,9 +74,30 @@ class TaskCard extends StatelessWidget {
     );
   }
 
+  Future<void> _onTapDeleteTask() async {
+    NetworkResponse response = await NetworkClient.getRequest(
+      url: Urls.deleteTaskUrl(widget.taskModel.id),
+    );
+    if (response.isSucess) {
+      widget.onTaskDeleted(widget.taskModel);
+    } else {
+      showSnackBarMessage(context, response.errorMessage!);
+    }
+  }
+
+  Future<void> _onTapEditTask() async {
+    NetworkResponse response = await NetworkClient.getRequest(
+      url: Urls.updateTaskStatusUrl(widget.taskModel.id, widget.updatedStatus!),
+    );
+    if (response.isSucess) {
+    } else {
+      showSnackBarMessage(context, response.errorMessage!, true);
+    }
+  }
+
   Color _getStatusChipColor() {
     late Color color;
-    switch (taskStatus) {
+    switch (widget.taskStatus) {
       case TaskStatus.sNew:
         color = Colors.blue;
       case TaskStatus.progress:

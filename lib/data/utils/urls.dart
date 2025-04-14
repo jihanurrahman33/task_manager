@@ -16,4 +16,7 @@ class Urls {
   static recoverVerifyOtpUrl(String email, String otp) =>
       '$_baseUrl/RecoverVerifyOtp/$email/$otp';
   static const recoverResetPasswordUrl = '$_baseUrl/RecoverResetPassword';
+  static deleteTaskUrl(String id) => '$_baseUrl/deleteTask/$id';
+  static updateTaskStatusUrl(String id, String status) =>
+      '$_baseUrl/updateTaskStatus/$id/$status';
 }

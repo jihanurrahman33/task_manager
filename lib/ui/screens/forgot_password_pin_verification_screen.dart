@@ -140,7 +140,7 @@ class _ForgotPasswordPinVerificationScreenState
         ),
       );
     } else {
-      showSnackBarMessage(context, response.errorMessage!);
+      showSnackBarMessage(context, response.errorMessage!, true);
     }
   }
 

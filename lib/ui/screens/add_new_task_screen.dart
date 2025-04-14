@@ -86,9 +86,10 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
     );
   }
 
-  void _onTapSubmitButton() {
+  void _onTapSubmitButton() async {
     if (_formKey.currentState!.validate()) {
-      addNewTask();
+      await addNewTask();
+      Navigator.pop(context, true);
     }
   }
 

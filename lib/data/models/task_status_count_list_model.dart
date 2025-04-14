@@ -12,6 +12,7 @@ class TaskStatusCountListModel {
         list.add(TaskStatusCountModel.fromJson(data));
       }
       statusCountList = list;
+      print(statusCountList[0].count);
     } else {
       statusCountList = [];
     }
