@@ -16,7 +16,7 @@ class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
         shrinkWrap: true,
         primary: false,
         itemBuilder: (context, index) {
-          return TaskCard(taskStatus: TaskStatus.progress);
+          // return TaskCard(taskStatus: TaskStatus.progress);
         },
         separatorBuilder: (context, index) => SizedBox(height: 8),
         itemCount: 6,

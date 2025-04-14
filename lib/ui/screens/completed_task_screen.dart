@@ -16,7 +16,7 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
         shrinkWrap: true,
         primary: false,
         itemBuilder: (context, index) {
-          return TaskCard(taskStatus: TaskStatus.completed);
+          // return TaskCard(taskStatus: TaskStatus.completed);
         },
         separatorBuilder: (context, index) => SizedBox(height: 8),
         itemCount: 6,

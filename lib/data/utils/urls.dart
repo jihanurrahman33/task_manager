@@ -12,4 +12,5 @@ class Urls {
 
   static const createTaskUrl = '$_baseUrl/createTask';
   static const taskStatusCountUrl = '$_baseUrl/taskStatusCount';
+  static const newTaskListUrl = '$_baseUrl/listTaskByStatus/New';
 }

@@ -16,7 +16,7 @@ class _CanceledTaskScreenState extends State<CanceledTaskScreen> {
         shrinkWrap: true,
         primary: false,
         itemBuilder: (context, index) {
-          return TaskCard(taskStatus: TaskStatus.canceled);
+          // return TaskCard(taskStatus: TaskStatus.canceled);
         },
         separatorBuilder: (context, index) => SizedBox(height: 8),
         itemCount: 6,
