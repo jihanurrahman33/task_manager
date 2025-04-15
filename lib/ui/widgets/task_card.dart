@@ -25,6 +25,7 @@ class TaskCard extends StatefulWidget {
 }
 
 class _TaskCardState extends State<TaskCard> {
+  String? updatedValue;
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -65,7 +66,39 @@ class _TaskCardState extends State<TaskCard> {
                   onPressed: _onTapDeleteTask,
                   icon: Icon(Icons.delete),
                 ),
-                IconButton(onPressed: _onTapEditTask, icon: Icon(Icons.edit)),
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'completed') {
+                      updatedValue = value;
+                      _onTapEditTask();
+                      setState(() {});
+                    } else if (value == 'progress') {
+                      updatedValue = value;
+                      _onTapEditTask();
+                      setState(() {});
+                    } else if (value == 'canceled') {
+                      updatedValue = value;
+                      _onTapEditTask();
+                      setState(() {});
+                    }
+                  },
+                  itemBuilder:
+                      (BuildContext context) => <PopupMenuEntry<String>>[
+                        const PopupMenuItem<String>(
+                          value: 'Completed',
+                          child: Text('Completed'),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'Progress',
+                          child: Text('Progress'),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'Canceled',
+                          child: Text('Canceled'),
+                        ),
+                      ],
+                  icon: Icon(Icons.edit),
+                ),
               ],
             ),
           ],
@@ -87,8 +120,9 @@ class _TaskCardState extends State<TaskCard> {
 
   Future<void> _onTapEditTask() async {
     NetworkResponse response = await NetworkClient.getRequest(
-      url: Urls.updateTaskStatusUrl(widget.taskModel.id, widget.updatedStatus!),
+      url: Urls.updateTaskStatusUrl(widget.taskModel.id, updatedValue!),
     );
+
     if (response.isSucess) {
     } else {
       showSnackBarMessage(context, response.errorMessage!, true);

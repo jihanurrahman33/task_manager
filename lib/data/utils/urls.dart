@@ -11,6 +11,7 @@ class Urls {
   static const createTaskUrl = '$_baseUrl/createTask';
   static const taskStatusCountUrl = '$_baseUrl/taskStatusCount';
   static const newTaskListUrl = '$_baseUrl/listTaskByStatus/New';
+  static const progressTaskListUrl = '$_baseUrl/listTaskByStatus/Progress';
   static recoverVerifyEmailUrl(String email) =>
       '$_baseUrl/RecoverVerifyEmail/$email';
   static recoverVerifyOtpUrl(String email, String otp) =>
@@ -19,4 +20,6 @@ class Urls {
   static deleteTaskUrl(String id) => '$_baseUrl/deleteTask/$id';
   static updateTaskStatusUrl(String id, String status) =>
       '$_baseUrl/updateTaskStatus/$id/$status';
+  static const completedTaskListUrl = '$_baseUrl/listTaskByStatus/completed';
+  static const canceledTaskListUrl = '$_baseUrl/listTaskByStatus/Canceled';
 }
