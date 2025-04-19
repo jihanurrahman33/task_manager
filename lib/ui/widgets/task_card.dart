@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/data/service/network_client.dart';
 import 'package:task_manager/data/utils/urls.dart';
+import 'package:task_manager/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 enum TaskStatus { sNew, progress, completed, canceled }
@@ -14,17 +15,20 @@ class TaskCard extends StatefulWidget {
     required this.taskModel,
     required this.onTaskDeleted,
     this.updatedStatus,
+    required this.refreshList,
   });
   final TaskStatus taskStatus;
   final TaskModel taskModel;
   final Function(TaskModel) onTaskDeleted;
   final String? updatedStatus;
+  final VoidCallback refreshList;
 
   @override
   State<TaskCard> createState() => _TaskCardState();
 }
 
 class _TaskCardState extends State<TaskCard> {
+  bool _inProgress = false;
   String? updatedValue;
   @override
   Widget build(BuildContext context) {
@@ -62,42 +66,21 @@ class _TaskCardState extends State<TaskCard> {
                   side: BorderSide.none,
                 ),
                 const Spacer(),
-                IconButton(
-                  onPressed: _onTapDeleteTask,
-                  icon: Icon(Icons.delete),
-                ),
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'completed') {
-                      updatedValue = value;
-                      _onTapEditTask();
-                      setState(() {});
-                    } else if (value == 'progress') {
-                      updatedValue = value;
-                      _onTapEditTask();
-                      setState(() {});
-                    } else if (value == 'canceled') {
-                      updatedValue = value;
-                      _onTapEditTask();
-                      setState(() {});
-                    }
-                  },
-                  itemBuilder:
-                      (BuildContext context) => <PopupMenuEntry<String>>[
-                        const PopupMenuItem<String>(
-                          value: 'Completed',
-                          child: Text('Completed'),
-                        ),
-                        const PopupMenuItem<String>(
-                          value: 'Progress',
-                          child: Text('Progress'),
-                        ),
-                        const PopupMenuItem<String>(
-                          value: 'Canceled',
-                          child: Text('Canceled'),
-                        ),
-                      ],
-                  icon: Icon(Icons.edit),
+                Visibility(
+                  visible: _inProgress == false,
+                  replacement: CenteredCircularProgressIndicator(),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: _onTapDeleteTask,
+                        icon: Icon(Icons.delete),
+                      ),
+                      IconButton(
+                        onPressed: _showUpdateStatucDialog,
+                        icon: Icon(Icons.edit),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -127,6 +110,79 @@ class _TaskCardState extends State<TaskCard> {
     } else {
       showSnackBarMessage(context, response.errorMessage!, true);
     }
+  }
+
+  Future<void> _changeTaskStatus(String status) async {
+    _inProgress = true;
+    setState(() {});
+    final NetworkResponse response = await NetworkClient.getRequest(
+      url: Urls.updateTaskStatusUrl(widget.taskModel.id, status),
+    );
+    _inProgress = false;
+
+    if (response.isSucess) {
+      widget.refreshList();
+    } else {
+      setState(() {});
+      showSnackBarMessage(context, response.errorMessage!, true);
+    }
+  }
+
+  bool isSelected(String status) => widget.taskModel.status == status;
+  void _showUpdateStatucDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Update Status'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                onTap: () {
+                  _popDialog();
+                  if (isSelected('New')) return;
+                  _changeTaskStatus('New');
+                },
+                title: Text('New'),
+                trailing: isSelected('New') ? Icon(Icons.done) : null,
+              ),
+              ListTile(
+                onTap: () {
+                  _popDialog();
+                  if (isSelected('Progress')) return;
+                  _changeTaskStatus('Progress');
+                },
+                title: Text('Progress'),
+                trailing: isSelected('Progress') ? Icon(Icons.done) : null,
+              ),
+              ListTile(
+                onTap: () {
+                  _popDialog();
+                  if (isSelected('Completed')) return;
+                  _changeTaskStatus('Completed');
+                },
+                title: Text('Completed'),
+                trailing: isSelected('Completed') ? Icon(Icons.done) : null,
+              ),
+              ListTile(
+                onTap: () {
+                  _popDialog();
+                  if (isSelected('Cancelled')) return;
+                  _changeTaskStatus('Cancelled');
+                },
+                title: Text('Cancelled'),
+                trailing: isSelected('Cancelled') ? Icon(Icons.done) : null,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _popDialog() {
+    Navigator.pop(context);
   }
 
   Color _getStatusChipColor() {

@@ -3,6 +3,7 @@ import 'package:task_manager/data/models/task_list_model.dart';
 import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/data/service/network_client.dart';
 import 'package:task_manager/data/utils/urls.dart';
+import 'package:task_manager/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 import 'package:task_manager/ui/widgets/task_card.dart';
 
@@ -25,18 +26,27 @@ class _CanceledTaskScreenState extends State<CanceledTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.separated(
-        shrinkWrap: true,
-        primary: false,
-        itemBuilder: (context, index) {
-          return TaskCard(
-            taskStatus: TaskStatus.canceled,
-            taskModel: _CanceledTaskList[index],
-            onTaskDeleted: (TaskModel) {},
-          );
-        },
-        separatorBuilder: (context, index) => SizedBox(height: 8),
-        itemCount: _CanceledTaskList.length,
+      body: Visibility(
+        visible: _getCanceledTasksInProgress == false,
+        replacement: CenteredCircularProgressIndicator(),
+        child: ListView.separated(
+          shrinkWrap: true,
+          primary: false,
+          itemBuilder: (context, index) {
+            return TaskCard(
+              refreshList: _getAllCanceledTaskList,
+              taskStatus: TaskStatus.canceled,
+              taskModel: _CanceledTaskList[index],
+              onTaskDeleted: (task) async {
+                _CanceledTaskList.removeWhere((t) => t.id == task.id);
+                await _getAllCanceledTaskList();
+                setState(() {});
+              },
+            );
+          },
+          separatorBuilder: (context, index) => SizedBox(height: 8),
+          itemCount: _CanceledTaskList.length,
+        ),
       ),
     );
   }

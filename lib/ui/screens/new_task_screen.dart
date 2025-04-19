@@ -59,6 +59,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                 primary: false,
                 itemBuilder: (context, index) {
                   return TaskCard(
+                    refreshList: _getAllNewTaskList,
                     onTaskDeleted: (task) async {
                       _newTaskList.removeWhere((t) => t.id == task.id);
                       await _getAllTaskStatusCount();

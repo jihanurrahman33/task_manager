@@ -3,6 +3,7 @@ import 'package:task_manager/data/models/task_list_model.dart';
 import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/data/service/network_client.dart';
 import 'package:task_manager/data/utils/urls.dart';
+import 'package:task_manager/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 import 'package:task_manager/ui/widgets/task_card.dart';
 
@@ -25,18 +26,27 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.separated(
-        shrinkWrap: true,
-        primary: false,
-        itemBuilder: (context, index) {
-          return TaskCard(
-            taskStatus: TaskStatus.completed,
-            taskModel: _completedTaskList[index],
-            onTaskDeleted: (TaskModel) {},
-          );
-        },
-        separatorBuilder: (context, index) => SizedBox(height: 8),
-        itemCount: _completedTaskList.length,
+      body: Visibility(
+        visible: _getCompleteTasksInProgress == false,
+        replacement: CenteredCircularProgressIndicator(),
+        child: ListView.separated(
+          shrinkWrap: true,
+          primary: false,
+          itemBuilder: (context, index) {
+            return TaskCard(
+              refreshList: _getAllCompleteTaskList,
+              taskStatus: TaskStatus.completed,
+              taskModel: _completedTaskList[index],
+              onTaskDeleted: (task) async {
+                _completedTaskList.removeWhere((t) => t.id == task.id);
+                await _getAllCompleteTaskList();
+                setState(() {});
+              },
+            );
+          },
+          separatorBuilder: (context, index) => SizedBox(height: 8),
+          itemCount: _completedTaskList.length,
+        ),
       ),
     );
   }

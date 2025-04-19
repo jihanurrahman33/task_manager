@@ -3,6 +3,7 @@ import 'package:task_manager/data/models/task_list_model.dart';
 import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/data/service/network_client.dart';
 import 'package:task_manager/data/utils/urls.dart';
+import 'package:task_manager/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 import 'package:task_manager/ui/widgets/task_card.dart';
 
@@ -25,18 +26,27 @@ class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.separated(
-        shrinkWrap: true,
-        primary: false,
-        itemBuilder: (context, index) {
-          return TaskCard(
-            taskStatus: TaskStatus.progress,
-            taskModel: _progressTaskList[index],
-            onTaskDeleted: (TaskModel) {},
-          );
-        },
-        separatorBuilder: (context, index) => SizedBox(height: 8),
-        itemCount: _progressTaskList.length,
+      body: Visibility(
+        visible: _getProgressTasksInProgress == false,
+        replacement: CenteredCircularProgressIndicator(),
+        child: ListView.separated(
+          shrinkWrap: true,
+          primary: false,
+          itemBuilder: (context, index) {
+            return TaskCard(
+              refreshList: _getAllProgressTaskList,
+              taskStatus: TaskStatus.progress,
+              taskModel: _progressTaskList[index],
+              onTaskDeleted: (task) async {
+                _progressTaskList.removeWhere((t) => t.id == task.id);
+                await _getAllProgressTaskList();
+                setState(() {});
+              },
+            );
+          },
+          separatorBuilder: (context, index) => SizedBox(height: 8),
+          itemCount: _progressTaskList.length,
+        ),
       ),
     );
   }

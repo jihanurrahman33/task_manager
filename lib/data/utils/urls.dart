@@ -20,6 +20,6 @@ class Urls {
   static deleteTaskUrl(String id) => '$_baseUrl/deleteTask/$id';
   static updateTaskStatusUrl(String id, String status) =>
       '$_baseUrl/updateTaskStatus/$id/$status';
-  static const completedTaskListUrl = '$_baseUrl/listTaskByStatus/completed';
-  static const canceledTaskListUrl = '$_baseUrl/listTaskByStatus/Canceled';
+  static const completedTaskListUrl = '$_baseUrl/listTaskByStatus/Completed';
+  static const canceledTaskListUrl = '$_baseUrl/listTaskByStatus/Cancelled';
 }
