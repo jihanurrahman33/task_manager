@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/models/task_list_model.dart';
-import 'package:task_manager/data/models/task_model.dart';
+import 'package:get/get.dart';
 import 'package:task_manager/data/models/task_status_count_list_model.dart';
 import 'package:task_manager/data/models/task_status_count_model.dart';
 import 'package:task_manager/data/service/network_client.dart';
 import 'package:task_manager/data/utils/urls.dart';
+import 'package:task_manager/ui/controllers/new_task_controller.dart';
 import 'package:task_manager/ui/screens/add_new_task_screen.dart';
 import 'package:task_manager/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/snack_bar_message.dart';
@@ -21,11 +21,6 @@ class NewTaskScreen extends StatefulWidget {
 class _NewTaskScreenState extends State<NewTaskScreen> {
   bool _getStatusCountInProgress = false;
   List<TaskStatusCountModel> _taskStatusCountList = [];
-  bool _getNewTasksInProgress = false;
-  List<TaskModel> _newTaskList = [];
-  List<TaskModel> _completedTaskList = [];
-  List<TaskModel> _progressTaskList = [];
-  List<TaskModel> _canceledTaskList = [];
 
   @override
   void initState() {
@@ -48,30 +43,35 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
               ),
               child: _buildSummarySection(),
             ),
-            Visibility(
-              visible: _getNewTasksInProgress == false,
-              replacement: SizedBox(
-                height: 300,
-                child: CenteredCircularProgressIndicator(),
-              ),
-              child: ListView.separated(
-                shrinkWrap: true,
-                primary: false,
-                itemBuilder: (context, index) {
-                  return TaskCard(
-                    refreshList: _getAllNewTaskList,
-                    onTaskDeleted: (task) async {
-                      _newTaskList.removeWhere((t) => t.id == task.id);
-                      await _getAllTaskStatusCount();
-                      setState(() {});
-                    },
-                    taskStatus: TaskStatus.sNew,
-                    taskModel: _newTaskList[index],
-                  );
-                },
-                separatorBuilder: (context, index) => SizedBox(height: 8),
-                itemCount: _newTaskList.length,
-              ),
+            GetBuilder<NewTaskController>(
+              builder:
+                  (controller) => Visibility(
+                    visible: controller.getNewTaskInProgress == false,
+                    replacement: SizedBox(
+                      height: 300,
+                      child: CenteredCircularProgressIndicator(),
+                    ),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      primary: false,
+                      itemBuilder: (context, index) {
+                        return TaskCard(
+                          refreshList: _getAllNewTaskList,
+                          onTaskDeleted: (task) async {
+                            controller.newTaskList.removeWhere(
+                              (t) => t.id == task.id,
+                            );
+                            await _getAllTaskStatusCount();
+                            setState(() {});
+                          },
+                          taskStatus: TaskStatus.sNew,
+                          taskModel: controller.newTaskList[index],
+                        );
+                      },
+                      separatorBuilder: (context, index) => SizedBox(height: 8),
+                      itemCount: controller.newTaskList.length,
+                    ),
+                  ),
             ),
           ],
         ),
@@ -133,18 +133,13 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   }
 
   Future<void> _getAllNewTaskList() async {
-    _getNewTasksInProgress = true;
-    setState(() {});
-    final NetworkResponse response = await NetworkClient.getRequest(
-      url: Urls.newTaskListUrl,
-    );
-    if (response.isSucess) {
-      TaskListModel taskListModel = TaskListModel.fromJson(response.data ?? {});
-      _newTaskList = taskListModel.taskList;
-    } else {
-      showSnackBarMessage(context, response.errorMessage!, true);
+    final bool isSucess = await Get.find<NewTaskController>().getNewTaskList();
+    if (!isSucess) {
+      showSnackBarMessage(
+        context,
+        Get.find<NewTaskController>().errorMessage!,
+        true,
+      );
     }
-    _getNewTasksInProgress = false;
-    setState(() {});
   }
 }
