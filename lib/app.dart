@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:task_manager/controller_binder.dart';
 import 'package:task_manager/ui/screens/splash_screen.dart';
 
 class TaskManagerApp extends StatelessWidget {
@@ -8,7 +10,8 @@ class TaskManagerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
+      initialBinding: ControllerBinder(),
       debugShowCheckedModeBanner: false,
       navigatorKey: TaskManagerApp.navigatorKey,
       theme: ThemeData(

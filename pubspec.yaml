@@ -32,6 +32,7 @@ dependencies:
   bd_phone_validator:
   shared_preferences: ^2.5.3
   intl:
+  get: ^4.7.2
   
 
 dev_dependencies:
