@@ -84,6 +84,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   }
 
   void _onTapAddNewTask() async {
+    //TODO delete task using controller
     final status = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => AddNewTaskScreen()),
