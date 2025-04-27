@@ -91,6 +91,7 @@ class _TaskCardState extends State<TaskCard> {
   }
 
   Future<void> _onTapDeleteTask() async {
+    //TODO delete task using controller
     NetworkResponse response = await NetworkClient.getRequest(
       url: Urls.deleteTaskUrl(widget.taskModel.id),
     );
@@ -101,16 +102,7 @@ class _TaskCardState extends State<TaskCard> {
     }
   }
 
-  Future<void> _onTapEditTask() async {
-    NetworkResponse response = await NetworkClient.getRequest(
-      url: Urls.updateTaskStatusUrl(widget.taskModel.id, updatedValue!),
-    );
 
-    if (response.isSucess) {
-    } else {
-      showSnackBarMessage(context, response.errorMessage!, true);
-    }
-  }
 
   Future<void> _changeTaskStatus(String status) async {
     _inProgress = true;
