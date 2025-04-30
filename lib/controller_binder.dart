@@ -1,4 +1,5 @@
 import 'package:get/instance_manager.dart';
+import 'package:task_manager/ui/controllers/add_new_task_controller.dart';
 import 'package:task_manager/ui/controllers/cancel_task_controller.dart';
 import 'package:task_manager/ui/controllers/complete_task_controller.dart';
 import 'package:task_manager/ui/controllers/login_controller.dart';
@@ -15,5 +16,6 @@ class ControllerBinder extends Bindings {
     Get.lazyPut(() => CompleteTaskController());
     Get.lazyPut(() => CancelTaskController());
     Get.lazyPut(() => RegisterController());
+    Get.put(AddNewTaskController());
   }
 }
