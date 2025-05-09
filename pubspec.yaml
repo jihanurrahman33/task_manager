@@ -34,6 +34,8 @@ dependencies:
   intl:
   get: ^4.7.2
   firebase_core:
+  cloud_firestore:
+  firebase_messaging: ^15.2.5
   
 
 dev_dependencies:
